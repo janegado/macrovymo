@@ -147,7 +147,7 @@ body{background:var(--bg);color:var(--text);font-family:'Be Vietnam Pro',sans-se
     <div class="header-title">Macro Collector v7</div>
     <div class="header-sub">Thuý Đỗ BĐS — 25 chỉ số / 21 phiếu · TV fields từ ảnh chụp · Nhập tay 15 ô</div>
   </div>
-  <div class="badge">v7.0</div>
+  <div class="badge">v7.1</div>
 </div>
 
 <!-- DATE BAR -->
@@ -875,7 +875,8 @@ function computeScore(){
     isNaN(m2vn)?null:(m2vn>12?'on':m2vn>=8?'neu':'de'),
     null, 'Block B+ — không tính phiếu; tăng mạnh thường đi cùng BĐS tăng sau 6–12 tháng');
 
-  // ---- CLUSTER LOGIC (OR: any DE = DE; no DE + any NEU = NEU; all ON = ON) ----
+  // ---- CLUSTER LOGIC v7.1 (đa số quyết định: >50% thành viên DE mới = DE;
+  //      còn lại có ít nhất 1 DE hoặc NEU thì = NEU; toàn bộ ON mới = ON) ----
   var CLUSTERS={
     lsr:{name:'Cụm Lãi Suất Thực', ids:[3,12]},
     lp: {name:'Cụm Lạm Phát',      ids:[4,5,15]},
@@ -886,7 +887,14 @@ function computeScore(){
     var members=inds.filter(function(i){return i.cluster_id===cid;});
     cl.members=members;
     var sigs=members.map(function(m){return m.signal;}).filter(function(s){return s!==null;});
-    cl.signal=sigs.includes('de')?'de':sigs.includes('neu')?'neu':sigs.length>0?'on':null;
+    // v7.1: đa số quyết định thay vì "1 DE kéo cả cụm DE" — tránh 1 chỉ số
+    // lệch nhẹ qua ngưỡng bị tính ngang với 1 chỉ số lệch nặng.
+    var deCount=sigs.filter(function(s){return s==='de';}).length;
+    var isMajorityDe = sigs.length>0 && deCount>sigs.length/2;
+    cl.signal = sigs.length===0 ? null
+              : isMajorityDe ? 'de'
+              : (sigs.includes('de')||sigs.includes('neu')) ? 'neu'
+              : 'on';
   }
 
   // ---- COUNT VOTES ----
@@ -935,7 +943,21 @@ function computeScore(){
              note:'Proxy stress thanh khoản liên ngân hàng. Bình thường: <0.1%, Cảnh báo: 0.1-0.3%, Stress: >0.3%'}
   };
 
-  return {inds:inds, CLUSTERS:CLUSTERS, deV:deV, onV:onV, neuV:neuV, totalVoted:totalVoted, blockC:blockC};
+  // v7.1: cảnh báo phân kỳ nội-ngoại VN — không tính vào phiếu (không đổi deV),
+  // chỉ hiển thị vì VN-Index tăng (ON) nhưng khối ngoại rút hoặc tỷ giá căng (DE)
+  // cùng lúc là mẫu hình cảnh báo đảo chiều mà phép cộng trừ phiếu không bắt được.
+  var vniInd=inds.find(function(i){return i.id===20;});
+  var nnInd=inds.find(function(i){return i.id===21;});
+  var fxInd=inds.find(function(i){return i.id===23;});
+  var divergenceWarning=null;
+  if(vniInd && vniInd.signal==='on' && ((nnInd&&nnInd.signal==='de')||(fxInd&&fxInd.signal==='de'))){
+    var parts=[];
+    if(nnInd&&nnInd.signal==='de') parts.push('khối ngoại bán ròng mạnh');
+    if(fxInd&&fxInd.signal==='de') parts.push('tỷ giá USD/VND căng');
+    divergenceWarning='Phân kỳ nội–ngoại: VN-Index đang RISK-ON ('+vniInd.val_str+') nhưng '+parts.join(' và ')+' — dòng tiền nội đẩy giá lên trong khi tín hiệu khác đang xấu đi, một mẫu hình cảnh báo đảo chiều cần theo dõi, không phải lỗi tính toán.';
+  }
+
+  return {inds:inds, CLUSTERS:CLUSTERS, deV:deV, onV:onV, neuV:neuV, totalVoted:totalVoted, blockC:blockC, divergenceWarning:divergenceWarning};
 }
 
 // ---- PLAYBOOK ----
@@ -973,8 +995,12 @@ function renderScorePanel(score){
   if(!panel) return;
   if(!score){panel.innerHTML='';return;}
 
-  var {inds, CLUSTERS, deV, onV, neuV, totalVoted, blockC}=score;
+  var {inds, CLUSTERS, deV, onV, neuV, totalVoted, blockC, divergenceWarning}=score;
   var kb=getKichanBan(deV);
+
+  var divergenceHtml = divergenceWarning
+    ? '<div style="margin-bottom:10px;padding:10px 14px;background:#1a0d28;border:1px solid #3a1a60;border-radius:8px;font-size:12px;color:#c0a0f0;line-height:1.6">⚠️ <strong>'+divergenceWarning+'</strong></div>'
+    : '';
 
   var sigIcon=function(s){
     if(s==='on') return '<span style="color:#34c97e;font-size:13px">✅</span>';
@@ -1023,7 +1049,7 @@ function renderScorePanel(score){
     var cl=CLUSTERS[cid];
     if(!cl) return '';
     var r='<tr class="cluster-hdr">'
-      +'<td colspan="3" style="padding-left:8px">'+cl.name+' (OR logic)</td>'
+      +'<td colspan="3" style="padding-left:8px">'+cl.name+' (đa số quyết định — v7.1)</td>'
       +'<td class="td-sig">'+sigIcon(cl.signal)+' '+sigLabel(cl.signal)+'</td>'
       +'</tr>';
     cl.members.forEach(function(m){ r+=indRow(m.id,true); });
@@ -1072,7 +1098,8 @@ function renderScorePanel(score){
   var actionHtml=actionLines.map(function(l){return '<div style="margin-top:4px">'+l+'</div>';}).join('');
 
   panel.innerHTML=
-    '<div class="score-card" style="border-color:'+kb.border+';background:'+kb.bg+'">'
+    divergenceHtml
+    +'<div class="score-card" style="border-color:'+kb.border+';background:'+kb.bg+'">'
     +'<div class="score-top">'
     +'<div class="score-numbox">'
     +'<div class="score-bignum" style="color:'+kb.color+'">'+deV+'</div>'
