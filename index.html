@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Macro Collector v7 — Thuý Đỗ BĐS</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;
+  --card:#161a24;
+  --card2:#1c2130;
+  --border:#2a3040;
+  --text:#e8ecf4;
+  --muted:#7a8499;
+  --fred:#4a9eff;
+  --gem:#34c97e;
+  --tv:#f0a500;
+  --red:#e05555;
+  --green:#34c97e;
+  --yellow:#f0c040;
+  --orange:#f0a060;
+  --accent:#4a9eff;
+}
+body{background:var(--bg);color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:15px;line-height:1.6;padding:0 0 60px}
+.header{background:linear-gradient(135deg,#0d1520 0%,#111827 100%);border-bottom:1px solid var(--border);padding:18px 24px;display:flex;align-items:center;gap:16px}
+.header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:.3px}
+.header-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.badge{background:#1e2d45;color:var(--fred);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid #2a4060}
+.section{margin:20px 16px 0;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.sec-head{background:var(--card2);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.sec-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.sec-num.tv{background:#2d2200;color:var(--tv);border:1px solid #4a3800}
+.sec-num.fred{background:#0d1e35;color:var(--fred);border:1px solid #1a3560}
+.sec-num.gem{background:#0d2218;color:var(--gem);border:1px solid #1a4030}
+.sec-num.out{background:#1a1a2e;color:#a78bfa;border:1px solid #2d2d50}
+.sec-title{font-size:14px;font-weight:700}
+.sec-title.tv{color:var(--tv)}
+.sec-title.fred{color:var(--fred)}
+.sec-title.gem{color:var(--gem)}
+.sec-title.out{color:#a78bfa}
+.sec-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sec-body{background:var(--card);padding:16px 18px}
+.input-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.input-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.input-grid{grid-template-columns:repeat(4,1fr)}}
+.input-group{display:flex;flex-direction:column;gap:4px}
+.input-label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.3px}
+.input-sub{font-size:10px;color:#4a5568}
+.input-field{background:#0d1018;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:14px;font-weight:500;padding:8px 10px;width:100%;transition:border-color .2s}
+.input-field:focus{outline:none;border-color:var(--tv)}
+.input-field.auto{border-color:#1a3050;color:var(--fred)}
+.input-field.computed{background:#0a1008;border-color:#1a3020;color:var(--gem)}
+.select-field{background:#0d1018;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;font-weight:500;padding:7px 10px;width:100%;cursor:pointer;transition:border-color .2s}
+.select-field:focus{outline:none;border-color:var(--tv)}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.section-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.fred-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.fred-input{background:#0d1018;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:7px 10px;flex:1;min-width:180px}
+.fred-input:focus{outline:none;border-color:var(--fred)}
+.btn{border:none;border-radius:7px;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;font-weight:600;font-size:13px;padding:8px 16px;transition:all .2s}
+.btn-fred{background:var(--fred);color:#000}
+.btn-fred:hover{background:#6ab0ff}
+.btn-copy{background:#2a3040;color:var(--text);font-size:12px;padding:6px 12px}
+.btn-copy:hover{background:#3a4050}
+.btn-gen{background:linear-gradient(135deg,#4a9eff,#a78bfa);color:#fff;padding:10px 22px;font-size:14px;width:100%;margin-top:12px}
+.btn-gen:hover{opacity:.9}
+.fred-status{font-size:11px;color:var(--muted)}
+.fred-status.ok{color:var(--green)}
+.fred-status.err{color:var(--red)}
+.paste-area{background:#0d1018;border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:12px;width:100%;resize:vertical;min-height:120px}
+.paste-area:focus{outline:none;border-color:var(--gem)}
+.output-box{background:#080b12;border:1px solid #2a2a4a;border-radius:8px;padding:14px;font-size:13px;color:#c8d8f0;font-family:monospace;line-height:1.8;white-space:pre-wrap;min-height:120px;margin-bottom:8px}
+.date-bar{background:#10141e;border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.date-label{font-size:12px;color:var(--muted)}
+.date-input{background:#0d1018;border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Be Vietnam Pro',sans-serif;font-size:13px;padding:6px 10px}
+.date-input:focus{outline:none;border-color:var(--accent)}
+.day-badge{font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px}
+.weekend-banner{display:none;background:#1a0d28;border:1px solid #3a1a60;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:#c0a0f0}
+.weekend-banner.show{display:block}
+.link-chip{background:#1a1e28;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);text-decoration:none;transition:all .2s}
+.link-chip.tv{border-color:#3a2e00;color:var(--tv)}
+.link-chip.tv:hover{background:#2d2200}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:500px){.row2{grid-template-columns:1fr}}
+.flex-end{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+
+
+/* ---- THRESHOLD BARS ---- */
+.thresh-row{display:flex;gap:3px;margin-top:5px}
+.tp{flex:1;font-size:9px;font-weight:600;padding:2px 3px;border-radius:3px;text-align:center;
+    border:1px solid #1a2030;color:#2a3848;background:#090c12;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;opacity:.55;transition:all .15s}
+.tp.act-on{opacity:1;background:#0d2d1a;color:#34c97e;border-color:#1a5030}
+.tp.act-neu{opacity:1;background:#2d2600;color:#f0c040;border-color:#504010}
+.tp.act-de{opacity:1;background:#2d0d0d;color:#e05555;border-color:#501a1a}
+.ind-desc{font-size:9px;color:#3a4858;margin-top:2px;line-height:1.3}
+
+/* ---- SCORE PANEL v5 ---- */
+.score-card{background:#08101e;border-radius:10px;padding:16px 18px;margin-bottom:10px;border-width:1px;border-style:solid}
+.score-top{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.score-numbox{flex-shrink:0}
+.score-bignum{font-size:48px;font-weight:800;line-height:1;letter-spacing:-2px}
+.score-denom{font-size:13px;color:var(--muted);margin-top:2px}
+.score-right{flex:1;min-width:160px}
+.score-level{font-size:17px;font-weight:700;line-height:1.3}
+.score-action{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.55;border-left:2px solid #2a3040;padding-left:8px}
+.score-bars{display:flex;gap:4px;margin-top:10px}
+.score-bar{height:5px;border-radius:3px;flex:1;background:#1a2030}
+.detail-btn{background:#1a1e28;border:1px solid var(--border);border-radius:6px;padding:5px 14px;font-size:11px;color:var(--muted);cursor:pointer;margin-bottom:10px;font-family:'Be Vietnam Pro',sans-serif;transition:all .2s}
+.detail-btn:hover{background:#252a38;color:var(--text)}
+.ind-table{width:100%;border-collapse:collapse;font-size:12px}
+.ind-table td{padding:4px 6px;border-bottom:1px solid #131720;vertical-align:middle}
+.ind-table tr:last-child td{border-bottom:none}
+.block-hdr td{padding:10px 6px 4px;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid #1a2030}
+.cluster-hdr td{background:#0d1428;font-size:11px;color:#a0a0ff;padding:5px 8px;border-bottom:1px solid #1a2038}
+.member-row td{padding:3px 6px 3px 20px;color:var(--muted);border-bottom:1px solid #0d1018}
+.info-row td{color:#3a4858;font-style:italic}
+.td-id{color:#3a4060;width:24px}
+.td-val{text-align:right;color:var(--muted);white-space:nowrap;width:130px}
+.td-sig{text-align:center;width:60px;font-size:11px;font-weight:600}
+.blockc-box{margin-top:10px;padding:10px 12px;background:#050a0f;border:1px solid #1a2030;border-radius:6px}
+.blockc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;font-size:12px;margin-top:6px}
+.blockc-item{display:flex;gap:6px;align-items:center}
+.note-box{margin-top:8px;padding:8px 10px;background:#0a0c10;border:1px solid #1a2030;border-radius:6px;font-size:10px;color:#3a4858;line-height:1.5}
+
+/* ---- MONTHLY REMINDER ---- */
+.remind-wrap{margin:12px 16px 0;border-radius:10px;border:1px solid #501a1a;background:#140808;padding:14px 18px}
+.remind-wrap.all-ok{border-color:#1a5030;background:#081408}
+.remind-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.remind-title{font-size:13px;font-weight:700}
+.remind-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.rchip{font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px;border:1px solid;cursor:default}
+.rchip.missing{background:#2d0808;color:#e07070;border-color:#501a1a}
+.rchip.done{background:#0a1e0a;color:#34c97e;border-color:#1a5030}
+.rchip.btn{cursor:pointer;background:#1a0d2d;color:#a78bfa;border-color:#3a1a60;transition:all .2s}
+.rchip.btn:hover{background:#2a1a40}
+.remind-dismiss{font-size:11px;color:#3a4858;background:none;border:none;cursor:pointer;font-family:'Be Vietnam Pro',sans-serif;padding:2px 6px;border-radius:4px}
+.remind-dismiss:hover{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Macro Collector v7</div>
+    <div class="header-sub">Thuý Đỗ BĐS — 25 chỉ số / 21 phiếu · TV fields từ ảnh chụp · Nhập tay 15 ô</div>
+  </div>
+  <div class="badge">v7.0</div>
+</div>
+
+<!-- DATE BAR -->
+<div style="margin:16px 16px 0">
+  <div class="date-bar">
+    <span class="date-label">Ngày phân tích:</span>
+    <input type="date" class="date-input" id="f-date" onchange="onDateChange()">
+    <span class="day-badge" id="day-badge" style="background:#1a2030;color:var(--muted)">--</span>
+    <span id="weekend-note" style="font-size:11px;color:var(--muted)"></span>
+  </div>
+  <div class="weekend-banner" id="weekend-banner">
+    CUỐI TUẦN — Thị trường Mỹ và VN đóng cửa. Chỉ theo dõi Crypto.<br>
+    Bước 1: Lấy Fear &amp; Greed + BTC Dominance + BTC giá.<br>
+    Bước 2: Bỏ qua Section 1 (Macro Mỹ) và Section 3 (Việt Nam).
+  </div>
+</div>
+
+<!-- TV WORKFLOW NOTE -->
+<div style="margin:10px 16px 0;padding:12px 16px;background:#12100a;border:1px solid #3a3000;border-radius:10px;font-size:12px;color:#907840;line-height:1.7">
+  📸 <strong style="color:#f0c040">Workflow v7:</strong> Chụp màn hình TradingView watchlist → gửi ảnh kèm vào Claude để phân tích.<br>
+  <span style="color:#604010">Không cần nhập vào dashboard:</span> <span style="color:#c08020">US10Y · US02Y · DXY · VIX · USD/JPY · MOVE · TIPS · Copper · Gold · Brent · KOSPI · BTC · ETH · BTC.D · VNINDEX</span><br>
+  Dashboard chỉ lưu các chỉ số <strong style="color:#f0c040">không có trên TradingView</strong> — nhập 1 lần/ngày hoặc 1 lần/tháng.
+</div>
+<div id="monthly-remind-outer" style="display:none;margin:10px 16px 0">
+  <div class="remind-wrap" id="monthly-remind-wrap">
+    <div class="remind-header">
+      <span class="remind-title" id="remind-title">📋 Chưa cập nhật tháng --</span>
+      <button class="remind-dismiss" onclick="dismissReminderToday()" title="Ẩn banner hôm nay (tự hiện lại ngày mai)">✕ ẩn hôm nay</button>
+    </div>
+    <div class="remind-chips" id="remind-chips"></div>
+  </div>
+</div>
+
+<!-- SECTION 1 NHAP TAY -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num tv">1</div>
+    <div>
+      <div class="sec-title tv">Nhập tay — Hàng ngày &amp; Hàng tháng</div>
+      <div class="sec-sub">Các chỉ số không có trên TradingView — bắt buộc nhập tay.</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="section-label">Hàng ngày</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Fear and Greed (/100)</span>
+          <a href="https://alternative.me/crypto/fear-and-greed-index/" target="_blank" style="color:#f7931a;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #3a2800;background:#1a1200">ALT</a>
+        </div>
+        <span class="input-sub" style="color:#c08aff">Cụm Tâm Lý Crypto</span>
+        <input class="input-field" id="v-fg" type="text" placeholder="20" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-fg"></div>
+        <div class="ind-desc">Tâm lý thị trường crypto 0–100 — dưới 40: sợ hãi; trên 60: tham lam</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Baltic Dry Index (điểm)</span>
+          <a href="https://tradingeconomics.com/commodity/baltic" target="_blank" class="link-chip tv">TE</a>
+        </div>
+        <span class="input-sub" style="color:#e05555">Điền điểm + chọn xu hướng 3-4 tuần bên dưới</span>
+        <input class="input-field" id="v-bdi" type="text" placeholder="2818" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-bdi"></div>
+        <div class="ind-desc">Giá cước vận tải biển hàng rời — phong vũ biểu thương mại toàn cầu</div>
+      </div>
+      <div class="input-group">
+        <span class="input-label" style="margin-bottom:4px;display:block">Xu hướng BDI (3-4 tuần)</span>
+        <span class="input-sub" style="color:#e0a040;margin-bottom:6px;display:block">Dùng cho tính phiếu — không xét 1 tuần lẻ</span>
+        <select class="select-field" id="v-bdi-trend" onchange="autoGen()">
+          <option value="">-- Chọn xu hướng --</option>
+          <option value="up">Tăng liên tục (thuận lợi)</option>
+          <option value="flat">Đi ngang (trung tính)</option>
+          <option value="down">Giảm liên tục (thận trọng)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Cập nhật hàng tháng — Mỹ</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">CPI Mỹ YoY (%)</span>
+          <a href="https://www.bls.gov/news.release/cpi.nr0.htm" target="_blank" style="color:#a0a0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #2a2a50;background:#10102a">BLS</a>
+        </div>
+        <span class="input-sub" style="color:#e0a040">Cụm Lạm Phát · Ra ~ngày 10–15 tháng sau (BLS)</span>
+        <input class="input-field" id="v-cpi-us" type="text" placeholder="4.2" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-cpi-us"></div>
+        <div class="ind-desc">Lạm phát tiêu dùng Mỹ so cùng kỳ — trên 4%: Fed khó cắt lãi</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">PPI Mỹ YoY (%)</span>
+          <a href="https://www.bls.gov/ppi/" target="_blank" style="color:#a0a0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #2a2a50;background:#10102a">BLS</a>
+        </div>
+        <span class="input-sub" style="color:#e0a040">Cụm Lạm Phát · Ra ~ngày 14–16 tháng sau (BLS)</span>
+        <input class="input-field" id="v-ppi-us" type="text" placeholder="6.5" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-ppi-us"></div>
+        <div class="ind-desc">Lạm phát sản xuất Mỹ — dẫn trước CPI 1–2 tháng</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Fed Funds Rate (%)</span>
+          <a href="https://www.federalreserve.gov/releases/h15/" target="_blank" style="color:#a0a0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #2a2a50;background:#10102a">FED</a>
+        </div>
+        <span class="input-sub">Họp 8 lần/năm · Còn lại 2026: 29/7 · 16/9 · 28/10 · 9/12</span>
+        <input class="input-field" id="v-fed" type="text" placeholder="3.62" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-fed"></div>
+        <div class="ind-desc">Lãi suất điều hành Fed — nền lãi suất toàn cầu</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">M2 Money Supply YoY (%)</span>
+          <span style="font-size:10px;color:var(--fred);padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">FRED auto</span>
+        </div>
+        <span class="input-sub" style="color:#4a9eff">Tự động điền khi bấm "Lấy từ FRED" ở Section 2</span>
+        <input class="input-field auto" id="v-m2" type="text" placeholder="4.5 (auto)" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-m2"></div>
+        <div class="ind-desc">Tốc độ tăng cung tiền M2 Mỹ — đo thanh khoản hệ thống</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">ETF Flows cổ phiếu Mỹ (tỷ USD/tháng)</span>
+          <a href="https://www.ssga.com/library-content/pdfs/etf/us/monthly-flash-flows.pdf" target="_blank" style="color:#a0a0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #2a2a50;background:#10102a">SPDR</a>
+        </div>
+        <span class="input-sub">Ra đầu tháng sau (~ngày 1–5) · Lấy số "Equity" trong báo cáo</span>
+        <input class="input-field" id="v-etf" type="text" placeholder="130" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-etf"></div>
+        <div class="ind-desc">Dòng tiền vào/ra quỹ ETF cổ phiếu Mỹ hàng tháng — tâm lý nhà đầu tư</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION 2 FRED -->
+<div class="section" id="sec-fred">
+  <div class="sec-head">
+    <div class="sec-num fred">2</div>
+    <div>
+      <div class="sec-title fred">FRED Auto — Block C (thứ Hai)</div>
+      <div class="sec-sub">Nhập FRED API Key — Bấm "Lấy từ FRED" — WALCL/TGA/RRP/CDX/M2 tự động. SOFR tra tay.</div>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="fred-bar">
+      <input type="password" class="fred-input" id="fred-api-key" placeholder="FRED API Key (lưu vào trình duyệt)" oninput="localStorage.setItem('fred_api_key',this.value)">
+      <button class="btn btn-fred" onclick="fetchFred()">Lấy từ FRED</button>
+      <span class="fred-status" id="fred-status"></span>
+    </div>
+    <div class="input-grid">
+      <div class="input-group">
+        <span class="input-label">WALCL (tỷ USD)</span>
+        <input class="input-field auto" id="v-walcl" type="text" placeholder="tự động" oninput="calcNetLiq();autoGen()">
+        <div class="thresh-row" id="tb-v-walcl"></div>
+        <div class="ind-desc">Tổng tài sản bảng cân đối Fed — đo quy mô bơm/hút tiền</div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">TGA (tỷ USD)</span>
+        <input class="input-field auto" id="v-tga" type="text" placeholder="tự động" oninput="calcNetLiq();autoGen()">
+        <div class="thresh-row" id="tb-v-tga"></div>
+        <div class="ind-desc">Tài khoản Kho bạc Mỹ tại Fed — tăng: hút tiền khỏi hệ thống</div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">RRP (tỷ USD)</span>
+        <input class="input-field auto" id="v-rrp" type="text" placeholder="tự động" oninput="calcNetLiq();autoGen()">
+        <div class="thresh-row" id="tb-v-rrp"></div>
+        <div class="ind-desc">Reverse Repo — tiền nhàn rỗi gửi Fed qua đêm; giảm: thanh khoản tốt hơn</div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">Net Liquidity (tỷ USD)</span>
+        <input class="input-field computed" id="v-netliq" type="text" placeholder="tự tính" readonly>
+        <div class="thresh-row" id="tb-v-netliq"></div>
+        <div class="ind-desc">Thanh khoản ròng Fed = WALCL – TGA – RRP — đo lượng tiền thực trong hệ thống</div>
+      </div>
+      <div class="input-group">
+        <span class="input-label">CDX HY Spread (bps)</span>
+        <input class="input-field auto" id="v-cdx" type="text" placeholder="tự động" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-cdx"></div>
+        <div class="ind-desc">Chênh lệch lợi suất trái phiếu rủi ro cao Mỹ — đo sức khỏe tín dụng doanh nghiệp</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">SOFR (%)</span>
+          <a href="https://www.newyorkfed.org/markets/reference-rates/sofr" target="_blank" style="color:#a0c8ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">NY Fed</a>
+        </div>
+        <input class="input-field" id="v-sofr" type="text" placeholder="4.30" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-sofr"></div>
+        <div class="ind-desc">Lãi suất cho vay qua đêm có tài sản thế chấp giữa các ngân hàng Mỹ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 VIET NAM -->
+<div class="section" id="sec-vn">
+  <div class="sec-head">
+    <div class="sec-num gem">3</div>
+    <div>
+      <div class="sec-title gem">Việt Nam — Nhập tay số liệu</div>
+      <div class="sec-sub">Bấm link — đọc số — điền vào ô. 6 tab, khoảng 3 phút.</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <div class="section-label">Khối ngoại HOSE — 24HMoney</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Khối ngoại (tỷ đồng/phiên)</span>
+          <a href="https://24hmoney.vn/indices/vn-index/giao-dich-khoi-ngoai" target="_blank" class="link-chip" style="color:var(--gem);border-color:#1a4030">24H</a>
+        </div>
+        <input class="input-field" id="v-nn" type="text" placeholder="-420 (âm = bán ròng)" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-nn"></div>
+        <div class="ind-desc">Dòng tiền khối ngoại sàn HOSE — âm: nước ngoài rút vốn khỏi VN</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Vàng SJC + Tỷ giá</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Vàng SJC bán ra</span>
+          <a href="https://sjc.com.vn" target="_blank" style="color:#f0c040;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #3a3000;background:#1a1800">SJC</a>
+          <a href="https://www.pnj.com.vn/blog/gia-vang/" target="_blank" style="color:#f0c040;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #3a3000;background:#1a1800">PNJ</a>
+        </div>
+        <span class="input-sub" style="color:#34c97e">Paste thẳng "146,700" — tự động đổi sang triệu/lượng</span>
+        <input class="input-field" id="v-sjc" type="text" placeholder="146,700 hoặc 146.7" oninput="convertSJC()">
+        <div class="thresh-row" id="tb-v-sjc"></div>
+        <div class="ind-desc">Giá vàng SJC bán ra — đơn vị triệu/lượng (vd: 151.8)</div>
+        <span id="sjc-note" style="font-size:10px;color:#f0a500;margin-top:3px;display:block;min-height:14px"></span>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">USD/VND (bán ra)</span>
+          <a href="https://www.vietcombank.com.vn/vi-VN/KHCN/Cong-cu-Tien-ich/KHCN---Ty-gia" target="_blank" style="color:#a0c8ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">VCB</a>
+        </div>
+        <span class="input-sub" style="color:#34c97e">Chấp nhận "26,440.00" — tự động xử lý đúng</span>
+        <input class="input-field" id="v-usdvnd" type="text" placeholder="26,440.00 hoặc 26440" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-usdvnd"></div>
+        <div class="ind-desc">Tỷ giá USD/VND Vietcombank bán ra — cao: đồng Việt yếu, nhập khẩu đắt hơn</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Lãi suất</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Lãi tiết kiệm 12T (%)</span>
+          <a href="https://www.vietcombank.com.vn/vi-VN/KHCN/Cong-cu-Tien-ich/KHCN---Lai-suat" target="_blank" style="color:#a0c8ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">VCB</a>
+        </div>
+        <input class="input-field" id="v-lsts" type="text" placeholder="6.8" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-lsts"></div>
+        <div class="ind-desc">Lãi tiết kiệm 12 tháng — trên 6.5%: cạnh tranh trực tiếp với BĐS · Không lịch cố định, cập nhật khi ngân hàng điều chỉnh</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Lãi vay sau ưu đãi (%)</span>
+          <a href="https://techcombank.com/thong-tin/blog/lai-suat-vay-ngan-hang" target="_blank" style="color:#a0c8ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">TCB</a>
+        </div>
+        <input class="input-field" id="v-lvay" type="text" placeholder="12-14" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-lvay"></div>
+        <div class="ind-desc">Lãi vay mua nhà sau ưu đãi — trên 11%: người vay ngại · Không lịch cố định, cập nhật khi ngân hàng điều chỉnh</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Cập nhật hàng tháng</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">CPI Việt Nam YoY (%)</span>
+          <a href="https://www.gso.gov.vn/du-lieu-va-so-lieu-thong-ke/2021/07/chi-so-gia-tieu-dung/" target="_blank" style="color:#a0a0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #2a2a50;background:#10102a">GSO</a>
+        </div>
+        <span class="input-sub">Ra ~ngày 29 hàng tháng (GSO)</span>
+        <input class="input-field" id="v-cpi-vn" type="text" placeholder="5.6" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-cpi-vn"></div>
+        <div class="ind-desc">Lạm phát tiêu dùng Việt Nam so cùng kỳ — ảnh hưởng chính sách NHNN</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label" style="color:#6ab0ff">Block B+ — Kinh tế vĩ mô Việt Nam (không tính phiếu, context bổ sung)</div>
+    <div style="font-size:10px;color:#3a4858;margin-bottom:10px;line-height:1.5">3 chỉ số theo dõi sức khỏe kinh tế nội địa — cập nhật hàng tháng hoặc khi có số liệu mới. Không thêm vào 21 phiếu nhưng được đưa vào output để phân tích.</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Tín dụng hệ thống YoY (%)</span>
+          <a href="https://sbv.gov.vn/vi/thong-tin-tai-chinh-tien-te" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">NHNN</a>
+        </div>
+        <span class="input-sub">Ra cuối tháng/đầu tháng sau (NHNN) — tra Gemini để lấy số:</span>
+        <div style="display:flex;align-items:center;gap:6px;margin:4px 0 6px">
+          <div style="flex:1;background:#0a1018;border:1px solid #1a3060;border-radius:5px;padding:5px 8px;font-size:10px;color:#5a7a9a;line-height:1.5;font-style:italic">Tăng trưởng tín dụng toàn hệ thống tính đến hết tháng [tháng này]/[năm nay] theo số liệu NHNN/SBV là bao nhiêu %? Cho mình số % YTD (so cuối năm trước) và % YoY (so cùng kỳ năm trước) nếu có.</div>
+          <button id="btn-gemini-credit" onclick="copyGemini('Tăng trưởng tín dụng toàn hệ thống tính đến hết tháng [MONTH]/[YEAR] theo số liệu NHNN/SBV là bao nhiêu %? Cho mình số % YTD (so cuối năm trước) và % YoY (so cùng kỳ năm trước) nếu có.','btn-gemini-credit')" style="flex-shrink:0;background:#0d1830;color:#6ab0ff;border:1px solid #1a3060;border-radius:5px;padding:5px 8px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Copy</button>
+        </div>
+        <input class="input-field" id="v-credit-growth" type="text" placeholder="14.5" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-credit-growth"></div>
+        <div class="ind-desc">Tốc độ tăng tín dụng toàn hệ thống — cao: tiền dễ vay, BĐS hưởng lợi; thấp: ngân hàng thắt chặt</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Lãi suất LNH O/N VND (%)</span>
+          <a href="https://tradingeconomics.com/vietnam/interbank-rate" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">SBV</a>
+        </div>
+        <span class="input-sub">Cập nhật hàng ngày · Mở link → đọc số "Last" → nhập vào đây</span>
+        <input class="input-field" id="v-ibr-on" type="text" placeholder="3.5" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-ibr-on"></div>
+        <div class="ind-desc">Lãi suất liên ngân hàng kỳ hạn ngắn VN (nguồn: SBV qua TradingEconomics). Link SBV bên trên → mở trang → đọc số "Last" trong bảng → nhập vào đây. Tăng đột ngột (>8%): ngân hàng đang khát vốn, tín dụng sắp siết</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">FDI thực hiện (tỷ USD, lũy kế năm)</span>
+          <a href="https://tradingeconomics.com/vietnam/foreign-direct-investment" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">MPI</a>
+        </div>
+        <span class="input-sub">Ra ~ngày 27–29 hàng tháng (MPI/GSO)</span>
+        <input class="input-field" id="v-fdi" type="text" placeholder="8.5" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-fdi"></div>
+        <div class="ind-desc">Vốn FDI giải ngân lũy kế — FDI vào Khánh Hòa/Vân Phong trực tiếp ảnh hưởng câu chuyện đất nền</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">PMI sản xuất VN</span>
+          <a href="https://tradingeconomics.com/vietnam/manufacturing-pmi" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">INV</a>
+        </div>
+        <span class="input-sub">Ra ngày 1–2 của tháng sau (S&amp;P Global)</span>
+        <input class="input-field" id="v-pmi-vn" type="text" placeholder="51.2" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-pmi-vn"></div>
+        <div class="ind-desc">Chỉ số sức khỏe ngành sản xuất VN — trên 50: mở rộng; dưới 50: thu hẹp</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">Cán cân thương mại (tỷ USD)</span>
+          <a href="https://tradingeconomics.com/vietnam/balance-of-trade" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">HQ</a>
+        </div>
+        <span class="input-sub">Ra ~ngày 15 và cuối tháng (Hải quan/GSO) · dương = xuất siêu</span>
+        <input class="input-field" id="v-trade-bal" type="text" placeholder="+2.1" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-trade-bal"></div>
+        <div class="ind-desc">Xuất siêu: VND ổn định, ít áp lực tỷ giá. Nhập siêu lớn: đồng Việt có thể yếu thêm</div>
+      </div>
+      <div class="input-group">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span class="input-label" style="margin:0">M2 Việt Nam YoY (%)</span>
+          <a href="https://tradingeconomics.com/vietnam/money-supply-m2" target="_blank" style="color:#6ab0ff;font-size:10px;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:4px;border:1px solid #1a3060;background:#0d1830">SBV</a>
+        </div>
+        <span class="input-sub">Ra cuối tháng/đầu tháng sau (NHNN) — tra Gemini để lấy % YoY:</span>
+        <div style="display:flex;align-items:center;gap:6px;margin:4px 0 6px">
+          <div style="flex:1;background:#0a1018;border:1px solid #1a3060;border-radius:5px;padding:5px 8px;font-size:10px;color:#5a7a9a;line-height:1.5;font-style:italic">Tốc độ tăng trưởng cung tiền M2 (tổng phương tiện thanh toán) YoY tính đến tháng [tháng này]/[năm nay] tại Việt Nam là bao nhiêu %? Nguồn từ NHNN/SBV. Cho mình số % YoY so cùng kỳ năm trước.</div>
+          <button id="btn-gemini-m2" onclick="copyGemini('Tốc độ tăng trưởng cung tiền M2 (tổng phương tiện thanh toán) YoY tính đến tháng [MONTH]/[YEAR] tại Việt Nam là bao nhiêu %? Nguồn từ NHNN/SBV. Cho mình số % YoY so cùng kỳ năm trước.','btn-gemini-m2')" style="flex-shrink:0;background:#0d1830;color:#6ab0ff;border:1px solid #1a3060;border-radius:5px;padding:5px 8px;font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap">📋 Copy</button>
+        </div>
+        <input class="input-field" id="v-m2-vn" type="text" placeholder="12.3" oninput="autoGen()">
+        <div class="thresh-row" id="tb-v-m2-vn"></div>
+        <div class="ind-desc">Tốc độ tăng cung tiền VN — tăng mạnh thường đi cùng BĐS tăng sau 6–12 tháng</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION 4 OUTPUT -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num out">4</div>
+    <div>
+      <div class="sec-title out">Output — Tín hiệu &amp; Paste vào Claude Project</div>
+      <div class="sec-sub">Tín hiệu 21 phiếu tự động tính. Copy Output — paste vào Claude Project "Phân Tích Macro BĐS".</div>
+    </div>
+  </div>
+  <div class="sec-body">
+
+    <!-- SCORE PANEL -->
+    <div id="score-panel"></div>
+
+    <!-- OUTPUT BLOCK -->
+    <div class="output-box" id="output-block">-- Điền số liệu ở các section trên để tạo output --</div>
+    <div class="flex-end">
+      <button class="btn btn-copy" id="btn-out" onclick="copyBox('output-block','btn-out','Copy Output')">Copy Output</button>
+      <button class="btn btn-gen" onclick="autoGen()">Tạo lại Output</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- HELPERS ----
+function v(id){ return (document.getElementById(id)||{}).value||''; }
+function sv(id,val){ var el=document.getElementById(id); if(el) el.value=val; }
+function num(s){ return parseFloat(String(s).replace(/,/g,'').replace(/%/g,'').replace(/[^\d.-]/g,'')); }
+
+// ---- MONTHLY REMINDER SYSTEM ----
+var MONTHLY_FIELDS=[
+  {key:'cpi_us',    label:'CPI Mỹ',         id:'v-cpi-us',         group:'Mỹ'},
+  {key:'ppi_us',    label:'PPI Mỹ',         id:'v-ppi-us',         group:'Mỹ'},
+  {key:'m2_yoy',    label:'M2 Mỹ',          id:'v-m2',             group:'Mỹ'},
+  {key:'etf_flows', label:'ETF Flows',      id:'v-etf',            group:'Mỹ'},
+  {key:'cpi_vn',    label:'CPI VN',         id:'v-cpi-vn',         group:'VN'},
+  {key:'credit_growth',label:'Tín dụng VN', id:'v-credit-growth',  group:'VN'},
+  {key:'fdi',       label:'FDI',            id:'v-fdi',            group:'VN'},
+  {key:'pmi_vn',    label:'PMI VN',         id:'v-pmi-vn',         group:'VN'},
+  {key:'trade_bal', label:'Cán cân TM',     id:'v-trade-bal',      group:'VN'},
+  {key:'m2_vn',     label:'M2 VN',          id:'v-m2-vn',          group:'VN'},
+];
+
+function getThisMonth(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function getMonthLabel(){
+  var d=new Date();
+  return (d.getMonth()+1)+'/'+d.getFullYear();
+}
+function getTodayKey(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function saveMonthlyMark(fieldKey){
+  localStorage.setItem('monthly_month_'+fieldKey, getThisMonth());
+}
+function isUpdatedThisMonth(fieldKey){
+  return localStorage.getItem('monthly_month_'+fieldKey)===getThisMonth();
+}
+function markNhom2Done(){
+  localStorage.setItem('nhom2_month', getThisMonth());
+  updateMonthlyBanner();
+}
+function dismissReminderToday(){
+  localStorage.setItem('remind_dismiss_day', getTodayKey());
+  document.getElementById('monthly-remind-outer').style.display='none';
+}
+
+function updateMonthlyBanner(){
+  var outer=document.getElementById('monthly-remind-outer');
+  var wrap=document.getElementById('monthly-remind-wrap');
+  var title=document.getElementById('remind-title');
+  var chips=document.getElementById('remind-chips');
+  if(!outer||!wrap||!title||!chips) return;
+
+  if(localStorage.getItem('remind_dismiss_day')===getTodayKey()){
+    outer.style.display='none'; return;
+  }
+
+  var missingFields=[], doneFields=[];
+  MONTHLY_FIELDS.forEach(function(f){
+    if(isUpdatedThisMonth(f.key)) doneFields.push(f);
+    else missingFields.push(f);
+  });
+
+  if(missingFields.length===0){
+    outer.style.display='none'; return;
+  }
+
+  outer.style.display='block';
+  var pct=Math.round(doneFields.length/MONTHLY_FIELDS.length*100);
+  title.innerHTML='📋 Cập nhật tháng '+getMonthLabel()
+    +' — <span style="font-size:11px;font-weight:400;color:#7a8499">'+doneFields.length+'/'+MONTHLY_FIELDS.length+' chỉ số ('+pct+'%)</span>';
+
+  var html='';
+  missingFields.forEach(function(f){
+    html+='<span class="rchip missing">✗ '+f.label+'</span>';
+  });
+  doneFields.forEach(function(f){
+    html+='<span class="rchip done">✓ '+f.label+'</span>';
+  });
+  chips.innerHTML=html;
+}
+
+function copyBox(boxId,btnId,label){
+  var el=document.getElementById(boxId);
+  var txt=el.tagName==='TEXTAREA'||el.tagName==='INPUT'?el.value:el.innerText;
+  navigator.clipboard.writeText(txt).then(function(){
+    var btn=document.getElementById(btnId);
+    if(btn){btn.textContent='Đã copy!';setTimeout(function(){btn.textContent=label;},1800);}
+  });
+}
+
+// ---- DATE ----
+var DAYS=['Chủ Nhật','Thứ Hai','Thứ Ba','Thứ Tư','Thứ Năm','Thứ Sáu','Thứ Bảy'];
+
+function onDateChange(){
+  var d=document.getElementById('f-date').value;
+  if(!d) return;
+  var dt=new Date(d+'T12:00:00');
+  var wd=dt.getDay();
+  var isWeekend=(wd===0||wd===6);
+  var badge=document.getElementById('day-badge');
+  var note=document.getElementById('weekend-note');
+  var banner=document.getElementById('weekend-banner');
+  badge.textContent=DAYS[wd];
+  badge.style.background=isWeekend?'#2d1a40':'#1a2a1a';
+  badge.style.color=isWeekend?'#c0a0f0':'#34c97e';
+  note.textContent=isWeekend?'— Cuối tuần: chỉ theo dõi Crypto':'';
+  banner.classList.toggle('show',isWeekend);
+  autoGen();
+}
+
+// ---- COMPUTED FIELDS ----
+function calcNetLiq(){
+  var w=num(v('v-walcl')), t=num(v('v-tga')), r=num(v('v-rrp'));
+  if(!isNaN(w)&&!isNaN(t)&&!isNaN(r)){ sv('v-netliq',(w-t-r).toFixed(1)); }
+  else { sv('v-netliq',''); }
+}
+// ---- FRED FETCH ----
+async function fetchSeries(sid,lim){
+  lim=lim||2;
+  var k=document.getElementById('fred-api-key').value.trim();
+  if(!k) throw new Error('Chưa nhập FRED API Key');
+  var fredUrl='https://api.stlouisfed.org/fred/series/observations?series_id='+sid+'&api_key='+k+'&limit='+lim+'&sort_order=desc&file_type=json';
+  var url='https://corsproxy.io/?url='+encodeURIComponent(fredUrl);
+  var r=await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  var d=await r.json();
+  if(d.error_message) throw new Error(d.error_message);
+  return d.observations;
+}
+function latestVal(obs){ return obs&&obs[0]?obs[0].value:''; }
+
+async function fetchFred(){
+  var st=document.getElementById('fred-status');
+  st.className='fred-status'; st.textContent='Đang lấy dữ liệu...';
+  try{
+    var [walcl,tga,rrp,cdx,m2]=await Promise.all([
+      fetchSeries('WALCL',2),
+      fetchSeries('WDTGAL',2),
+      fetchSeries('WLRRAL',2),
+      fetchSeries('BAMLH0A0HYM2',2),
+      fetchSeries('M2SL',13)
+    ]);
+    var wv=latestVal(walcl); if(wv&&wv!='.'){ sv('v-walcl',(parseFloat(wv)/1000).toFixed(1)); }
+    var tv=latestVal(tga); if(tv&&tv!='.'){ sv('v-tga',(parseFloat(tv)/1000).toFixed(1)); }
+    var rv=latestVal(rrp); if(rv&&rv!='.'){ sv('v-rrp',(parseFloat(rv)/1000).toFixed(1)); }
+    var cv=latestVal(cdx); if(cv&&cv!='.'){ sv('v-cdx',(parseFloat(cv)*100).toFixed(1)); }
+    if(m2&&m2.length>=13&&m2[0].value!='.'&&m2[12].value!='.'){
+      var m2now=parseFloat(m2[0].value), m2prev=parseFloat(m2[12].value);
+      var m2yoy=((m2now-m2prev)/m2prev*100).toFixed(1);
+      sv('v-m2',m2yoy);
+      localStorage.setItem('m2_yoy', m2yoy);
+      saveMonthlyMark('m2_yoy');
+    }
+    calcNetLiq(); autoGen();
+    st.className='fred-status ok';
+    st.textContent='Đã cập nhật '+new Date().toLocaleTimeString('vi-VN');
+  }catch(e){
+    st.className='fred-status err';
+    st.textContent='Lỗi: '+e.message;
+  }
+}
+
+// ---- FULL 21-PHIEU SCORING ENGINE ----
+function gv(id){
+  var el=document.getElementById(id);
+  if(!el) return NaN;
+  return parseFloat(el.value.replace(/,/g,'').replace(/%/g,'').replace(/[^\d.-]/g,''));
+}
+function gs(id){ return (document.getElementById(id)||{}).value||''; }
+
+function sig3(val,lo,hi){
+  // lo = RISK-ON / NEUTRAL boundary, hi = NEUTRAL / DE-RISK boundary
+  if(isNaN(val)) return null;
+  return val<lo?'on':val<=hi?'neu':'de';
+}
+function sig3rev(val,lo,hi){
+  // Reversed: higher is better (e.g. M2)
+  if(isNaN(val)) return null;
+  return val>hi?'on':val>=lo?'neu':'de';
+}
+
+function computeScore(){
+  var inds=[];
+
+  function push(id,name,val_str,signal,cluster_id,note){
+    inds.push({id:id,name:name,val_str:val_str,signal:signal,cluster_id:cluster_id||null,note:note||''});
+  }
+
+  // 1. Yield Curve
+  var yc=parseFloat((gs('v-yc')||'').replace('%',''));
+  push(1,'Yield Curve (10Y-2Y)', isNaN(yc)?null:yc.toFixed(3)+'%',
+    isNaN(yc)?null:(yc>0?'on':yc>=-0.5?'neu':'de'), null);
+
+  // 2. DXY
+  var dxy=gv('v-dxy');
+  push(2,'DXY', isNaN(dxy)?null:dxy.toFixed(2), sig3(dxy,100,103), null);
+
+  // 3. 10Y Treasury [Cum Lai Suat Thuc]
+  var t10=gv('v-10y');
+  push(3,'10Y Treasury', isNaN(t10)?null:t10.toFixed(2)+'%', sig3(t10,4.0,4.8), 'lsr');
+
+  // 4. CPI My [Cum Lam Phat]
+  var cpius=gv('v-cpi-us');
+  push(4,'CPI Mỹ YoY', isNaN(cpius)?null:cpius.toFixed(1)+'%', sig3(cpius,3,4), 'lp');
+
+  // 5. PPI My [Cum Lam Phat]
+  var ppius=gv('v-ppi-us');
+  push(5,'PPI Mỹ YoY', isNaN(ppius)?null:ppius.toFixed(1)+'%', sig3(ppius,3,5), 'lp');
+
+  // 6. Fed Funds Rate
+  var fed=gv('v-fed');
+  push(6,'Fed Funds Rate', isNaN(fed)?null:fed.toFixed(2)+'%', sig3(fed,3.5,4.5), null);
+
+  // 7. M2 YoY (reversed: >5% = ON)
+  var m2=gv('v-m2');
+  push(7,'M2 Money Supply YoY', isNaN(m2)?null:m2.toFixed(1)+'%',
+    isNaN(m2)?null:(m2>5?'on':m2>=3?'neu':'de'), null);
+
+  // 8. VIX
+  var vix=gv('v-vix');
+  push(8,'VIX', isNaN(vix)?null:vix.toFixed(2), sig3(vix,18,25), null);
+
+  // 9. USD/JPY
+  var usdjpy=gv('v-usdjpy');
+  push(9,'USD/JPY', isNaN(usdjpy)?null:usdjpy.toFixed(1), sig3(usdjpy,150,155), null);
+
+  // 10. Copper/Gold Ratio — từ ảnh TradingView (v7: không còn lưu lịch sử CG)
+  push(10,'Copper/Gold Ratio', '[TV — HG1!/GC1!]', null, null, 'Đọc từ ảnh TradingView');
+
+  // 11. MOVE Index
+  var move=gv('v-move');
+  push(11,'MOVE Index', isNaN(move)?null:move.toFixed(1), sig3(move,80,120), null);
+
+  // 12. TIPS 10Y [Cum Lai Suat Thuc]
+  var tips=gv('v-tips');
+  push(12,'TIPS 10Y Real Yield', isNaN(tips)?null:tips.toFixed(2)+'%', sig3(tips,1.5,2.0), 'lsr');
+
+  // 13. ETF Flows co phieu My
+  var etf=gv('v-etf');
+  push(13,'ETF Flows (cổ phiếu Mỹ)', isNaN(etf)?null:etf.toFixed(0)+' tỷ USD/tháng',
+    isNaN(etf)?null:(etf>100?'on':etf>=0?'neu':'de'), null);
+
+  // 14. Baltic Dry Index — xu huong select
+  var bdiTrend=gs('v-bdi-trend');
+  var bdi=gv('v-bdi');
+  var bdiSig=bdiTrend==='up'?'on':bdiTrend==='flat'?'neu':bdiTrend==='down'?'de':null;
+  var bdiLabel={'up':'Tăng','flat':'Đi ngang','down':'Giảm','':'?'}[bdiTrend]||'?';
+  push(14,'Baltic Dry Index', isNaN(bdi)?null:bdi.toFixed(0)+' ('+bdiLabel+')',
+    bdiSig, null, 'Xét xu hướng 3-4 tuần, không xét biến động 1 kỳ');
+
+  // 15. Brent Crude [Cum Lam Phat]
+  var brent=gv('v-brent');
+  push(15,'Brent Crude Oil', isNaN(brent)?null:brent.toFixed(1)+' USD/thùng', sig3(brent,75,90), 'lp');
+
+  // 16. KOSPI bien dong tuan
+  var kospiChg=parseFloat((gs('v-kospi-chg')||'').replace('%',''));
+  push(16,'KOSPI (biến động tuần)', isNaN(kospiChg)?null:(kospiChg>=0?'+':'')+kospiChg.toFixed(2)+'%',
+    isNaN(kospiChg)?null:(kospiChg>-5?'on':kospiChg>=-10?'neu':'de'),
+    null, 'DE-RISK khi giảm >10%/tuần');
+
+  // 17. BTC — informational (signal qua Cum Tam Ly Crypto)
+  var btc=gv('v-btc');
+  push(17,'BTC (gia)', isNaN(btc)?null:btc.toLocaleString()+' USDT',
+    null, null, 'Không có phiếu riêng — tín hiệu qua Cụm Tâm Lý Crypto (F&G + BTCd)');
+
+  // 18. Fear & Greed [Cum Tam Ly Crypto]
+  var fg=gv('v-fg');
+  push(18,'Fear & Greed Index', isNaN(fg)?null:fg.toFixed(0)+'/100',
+    isNaN(fg)?null:(fg>60?'on':fg>=40?'neu':'de'), 'tlc');
+
+  // 19. BTC Dominance [Cum Tam Ly Crypto]
+  var btcd=gv('v-btcd');
+  push(19,'BTC Dominance', isNaN(btcd)?null:btcd.toFixed(2)+'%',
+    isNaN(btcd)?null:(btcd<50?'on':btcd<=60?'neu':'de'), 'tlc',
+    'RISK-ON khi <50% (altcoin season); DE-RISK khi >60% (tiền chạy về BTC)');
+
+  // Block B
+  // 20. VN-Index
+  var vni=gv('v-vnindex');
+  push(20,'VN-Index', isNaN(vni)?null:vni.toFixed(2),
+    isNaN(vni)?null:(vni>1400?'on':vni>=1200?'neu':'de'), null);
+
+  // 21. Khối ngoại HOSE
+  var nn=gv('v-nn');
+  push(21,'Khối ngoại (HOSE)', isNaN(nn)?null:(nn>=0?'+':'')+nn.toFixed(0)+' tỷ đồng/phiên',
+    isNaN(nn)?null:(nn>0?'on':nn>=-500?'neu':'de'),
+    null, 'DE-RISK khi bán ròng >500 tỷ/phiên');
+
+  // 22. Vang SJC — informational (khong co nguong ro rang)
+  var sjc=getSJCValue();
+  push(22,'Vàng SJC (bán ra)', isNaN(sjc)?null:sjc.toFixed(1)+' tr/lượng',
+    null, null, 'Theo dõi chênh lệch vs giá thế giới — không có phiếu rõ ràng');
+
+  // 23. USD/VND
+  var usdvnd=parseFloat((gs('v-usdvnd')||'').replace(/,/g,'').replace(/[^\d.-]/g,''));
+  push(23,'USD/VND', isNaN(usdvnd)?null:usdvnd.toLocaleString(),
+    isNaN(usdvnd)?null:(usdvnd<25000?'on':usdvnd<=25500?'neu':'de'), null);
+
+  // 24. Lai tiet kiem 12T
+  var lsts=gv('v-lsts');
+  push(24,'Lãi tiết kiệm 12T', isNaN(lsts)?null:lsts.toFixed(1)+'%',
+    isNaN(lsts)?null:(lsts<5.5?'on':lsts<=6.5?'neu':'de'),
+    null, 'Cạnh tranh BĐS khi >6.5% — ngưỡng tâm lý 7%');
+
+  // 25. Lai vay mua nha
+  var lvayStr=gs('v-lvay');
+  var lvay=parseFloat(lvayStr);
+  push(25,'Lãi vay mua nhà', lvayStr||null,
+    isNaN(lvay)?null:(lvay<9?'on':lvay<=11?'neu':'de'), null);
+
+  // Block B+ — Informational only, không tính phiếu
+  var creditGrowth=gv('v-credit-growth');
+  push(26,'Tín dụng hệ thống YoY', isNaN(creditGrowth)?null:creditGrowth.toFixed(1)+'%',
+    isNaN(creditGrowth)?null:(creditGrowth>14?'on':creditGrowth>=8?'neu':'de'),
+    null, 'Block B+ — không tính phiếu; >14%: thuận lợi; <8%: tín dụng thắt chặt');
+
+  var ibrOn=gv('v-ibr-on');
+  push(27,'Lãi suất LNH O/N VND', isNaN(ibrOn)?null:ibrOn.toFixed(2)+'%',
+    isNaN(ibrOn)?null:(ibrOn<3?'on':ibrOn<=5?'neu':'de'),
+    null, 'Block B+ — không tính phiếu; >5%: ngân hàng khát vốn');
+
+  var fdi=gv('v-fdi');
+  push(28,'FDI thực hiện (lũy kế năm)', isNaN(fdi)?null:fdi.toFixed(1)+' tỷ USD',
+    null, null, 'Block B+ — không tính phiếu; theo dõi so sánh cùng kỳ');
+
+  var pmivn=gv('v-pmi-vn');
+  push(29,'PMI sản xuất VN', isNaN(pmivn)?null:pmivn.toFixed(1),
+    isNaN(pmivn)?null:(pmivn>52?'on':pmivn>=50?'neu':'de'),
+    null, 'Block B+ — không tính phiếu; >50: sản xuất mở rộng');
+
+  var tradebal=gv('v-trade-bal');
+  push(30,'Cán cân thương mại', isNaN(tradebal)?null:(tradebal>=0?'+':'')+tradebal.toFixed(1)+' tỷ USD',
+    isNaN(tradebal)?null:(tradebal>0?'on':tradebal>=-1?'neu':'de'),
+    null, 'Block B+ — không tính phiếu; dương: xuất siêu, VND ổn định');
+
+  var m2vn=gv('v-m2-vn');
+  push(31,'M2 Việt Nam YoY', isNaN(m2vn)?null:m2vn.toFixed(1)+'%',
+    isNaN(m2vn)?null:(m2vn>12?'on':m2vn>=8?'neu':'de'),
+    null, 'Block B+ — không tính phiếu; tăng mạnh thường đi cùng BĐS tăng sau 6–12 tháng');
+
+  // ---- CLUSTER LOGIC (OR: any DE = DE; no DE + any NEU = NEU; all ON = ON) ----
+  var CLUSTERS={
+    lsr:{name:'Cụm Lãi Suất Thực', ids:[3,12]},
+    lp: {name:'Cụm Lạm Phát',      ids:[4,5,15]},
+    tlc:{name:'Cụm Tâm Lý Crypto', ids:[18,19]}
+  };
+  for(var cid in CLUSTERS){
+    var cl=CLUSTERS[cid];
+    var members=inds.filter(function(i){return i.cluster_id===cid;});
+    cl.members=members;
+    var sigs=members.map(function(m){return m.signal;}).filter(function(s){return s!==null;});
+    cl.signal=sigs.includes('de')?'de':sigs.includes('neu')?'neu':sigs.length>0?'on':null;
+  }
+
+  // ---- COUNT VOTES ----
+  // Standalone indicators with clear scoring
+  var STANDALONE=[1,2,6,7,8,9,10,11,13,14,16,20,21,23,24,25];
+  var INFO_ONLY=[17,22]; // No independent vote
+
+  var deV=0, onV=0, neuV=0, totalVoted=0;
+
+  STANDALONE.forEach(function(id){
+    var ind=inds.find(function(i){return i.id===id;});
+    if(!ind||ind.signal===null) return;
+    totalVoted++;
+    if(ind.signal==='de') deV++;
+    else if(ind.signal==='on') onV++;
+    else neuV++;
+  });
+
+  for(var cid2 in CLUSTERS){
+    var cl2=CLUSTERS[cid2];
+    if(cl2.signal===null) continue;
+    totalVoted++;
+    if(cl2.signal==='de') deV++;
+    else if(cl2.signal==='on') onV++;
+    else neuV++;
+  }
+
+  // Block C (khong tinh phieu, chi phan tich dinh tinh)
+  var netliq=parseFloat(gs('v-netliq'));
+  var sofr=gv('v-sofr');
+  var cdx=gv('v-cdx');
+  var fed2=gv('v-fed');
+  var sofrFed=(!isNaN(sofr)&&!isNaN(fed2))?(sofr-fed2):NaN;
+
+  var blockC={
+    netliq:{val:isNaN(netliq)?null:netliq.toFixed(1)+' ty USD',
+            signal:null, note:'Tăng tuần = tốt / Giảm tuần = xấu'},
+    sofr:{val:isNaN(sofr)?null:sofr.toFixed(2)+'%',
+          signal:isNaN(sofr)?null:(sofr<=4?'on':sofr<=4.5?'neu':'de'),
+          note:'Ngưỡng: ≤4% tốt, 4-4.5% trung tính, >4.5% xấu'},
+    cdx:{val:isNaN(cdx)?null:cdx.toFixed(1)+' bps',
+         signal:isNaN(cdx)?null:(cdx<300?'on':cdx<=400?'neu':'de'),
+         note:'Ngưỡng: <300 tốt, 300-400 trung tính, >400 xấu'},
+    sofrFed:{val:isNaN(sofrFed)?null:(sofrFed>=0?'+':'')+sofrFed.toFixed(3)+'% (SOFR - Fed Rate)',
+             signal:isNaN(sofrFed)?null:(Math.abs(sofrFed)<0.1?'on':Math.abs(sofrFed)<0.3?'neu':'de'),
+             note:'Proxy stress thanh khoản liên ngân hàng. Bình thường: <0.1%, Cảnh báo: 0.1-0.3%, Stress: >0.3%'}
+  };
+
+  return {inds:inds, CLUSTERS:CLUSTERS, deV:deV, onV:onV, neuV:neuV, totalVoted:totalVoted, blockC:blockC};
+}
+
+// ---- PLAYBOOK ----
+function getKichanBan(deV){
+  if(deV<=2) return {
+    level:'THUẬN LỢI', color:'#34c97e', bg:'#0d2d1a', border:'#1a5030',
+    emoji:'✅', bar:'on',
+    action:'Mở rộng tìm khách mới. Đẩy chốt mạnh. Thị trường đang thuận — đây là thời điểm để tiếp cận khách có tiền mặt.\nSản phẩm <1 tỷ pháp lý sạch: đang là lựa chọn lý tưởng.'
+  };
+  if(deV<=4) return {
+    level:'TRUNG TÍNH — thận trọng', color:'#f0c040', bg:'#2d2600', border:'#504010',
+    emoji:'⚠️', bar:'neu',
+    action:'Chăm sóc khách đang cân nhắc, không thúc đẩy khách chưa sẵn sàng.\nGiữ quan hệ tốt — môi trường có thể chuyển hướng trong 1-2 tuần tới.'
+  };
+  if(deV<=9) return {
+    level:'THẬN TRỌNG NHẸ', color:'#f0a060', bg:'#2d1800', border:'#503010',
+    emoji:'🔶', bar:'de-light',
+    action:'Tập trung khách ấm và cash buyer <1 tỷ, pháp lý sạch.\nChưa mở rộng khách mới tích cực. Ưu tiên lô đất gần KKT Vân Phong, KCN Ninh Xuân 2.\nChọn việc chọn khách — không nên đẩy chốt trong môi trường này.'
+  };
+  if(deV<=14) return {
+    level:'THẬN TRỌNG RÕ', color:'#e05555', bg:'#2d0d0d', border:'#501a1a',
+    emoji:'🔴', bar:'de',
+    action:'Chỉ chăm khách đã xem đất hoặc đặt cọc. Tạm ngưng tìm khách mới.\nMôi trường không thuận — khách có tiền mặt cũng đang do dự. Chuẩn bị kịch bản giảm giá nhẹ (5-8%) nếu khách yêu cầu. Theo dõi sát: VN-Index, SOFR, USD/VND.'
+  };
+  return {
+    level:'KHỦNG HOẢNG', color:'#e05555', bg:'#2d0000', border:'#600000',
+    emoji:'🚨', bar:'crisis',
+    action:'Bảo toàn. Không giới thiệu BĐS trong 1-2 tuần.\nChỉ xử lý giao dịch đang dở. Theo dõi sát Net Liquidity + SOFR + khối ngoại.\nDấu hiệu thoát khủng hoảng: VIX backwardation + ETF ngừng rút ròng + DXY đảo chiều.'
+  };
+}
+
+// ---- RENDER SCORE PANEL ----
+function renderScorePanel(score){
+  var panel=document.getElementById('score-panel');
+  if(!panel) return;
+  if(!score){panel.innerHTML='';return;}
+
+  var {inds, CLUSTERS, deV, onV, neuV, totalVoted, blockC}=score;
+  var kb=getKichanBan(deV);
+
+  var sigIcon=function(s){
+    if(s==='on') return '<span style="color:#34c97e;font-size:13px">✅</span>';
+    if(s==='de') return '<span style="color:#e05555;font-size:13px">🔴</span>';
+    if(s==='neu') return '<span style="color:#f0c040;font-size:13px">⚠️</span>';
+    return '<span style="color:#2a3848">○</span>';
+  };
+  var sigLabel=function(s){
+    if(s==='on') return '<span style="color:#34c97e;font-size:10px;font-weight:700">RISK-ON</span>';
+    if(s==='de') return '<span style="color:#e05555;font-size:10px;font-weight:700">DE-RISK</span>';
+    if(s==='neu') return '<span style="color:#f0c040;font-size:10px;font-weight:700">NEUTRAL</span>';
+    return '<span style="color:#2a3848;font-size:10px">—</span>';
+  };
+
+  // Build progress bars (5 segments)
+  var bars='';
+  var barColors=['#34c97e','#34c97e','#f0c040','#f0a060','#e05555','#e05555'];
+  var barThresholds=[0,3,5,10,15];
+  for(var bi=0;bi<5;bi++){
+    var filled=deV>barThresholds[bi];
+    bars+='<div style="height:5px;border-radius:3px;flex:1;background:'+(filled?barColors[bi+1]:'#1a2030')+'"></div>';
+  }
+
+  // Build indicator rows
+  var rows='';
+  var STANDALONE=[1,2,6,7,8,9,10,11,13,14,16];
+  var BLOCK_B=[20,21,22,23,24,25];
+  var BLOCK_BPLUS=[26,27,28,29,30,31];
+  var CRYPTO_STANDALONE=[17];
+
+  function indRow(id, isClusterMember){
+    var ind=inds.find(function(i){return i.id===id;});
+    if(!ind) return '';
+    var isInfo=(id===17||id===22);
+    var leftPad=isClusterMember?'padding-left:22px':'';
+    var numColor=isClusterMember?'color:#2a3848':'color:#3a4060';
+    return '<tr'+(isInfo?' class="info-row"':'')+'>'
+      +'<td class="td-id" style="'+numColor+';'+leftPad+'">#'+id+'</td>'
+      +'<td style="'+leftPad+';'+(isInfo?'color:#3a4858;font-style:italic':'')+'">'+ind.name+'</td>'
+      +'<td class="td-val">'+(ind.val_str||'<span style="color:#2a3848">—</span>')+'</td>'
+      +'<td class="td-sig">'+sigIcon(ind.signal)+'</td>'
+      +'</tr>';
+  }
+
+  function clusterBlock(cid){
+    var cl=CLUSTERS[cid];
+    if(!cl) return '';
+    var r='<tr class="cluster-hdr">'
+      +'<td colspan="3" style="padding-left:8px">'+cl.name+' (OR logic)</td>'
+      +'<td class="td-sig">'+sigIcon(cl.signal)+' '+sigLabel(cl.signal)+'</td>'
+      +'</tr>';
+    cl.members.forEach(function(m){ r+=indRow(m.id,true); });
+    return r;
+  }
+
+  rows+='<tr class="block-hdr"><td colspan="4">BLOCK A — TÀI CHÍNH & TIỀN TỆ</td></tr>';
+  rows+=indRow(1); rows+=indRow(2);
+  rows+=clusterBlock('lsr');
+  [6,7,8,9,10,11,13].forEach(function(id){rows+=indRow(id);});
+
+  rows+='<tr class="block-hdr"><td colspan="4">BLOCK A — KINH TẾ THỰC & RỦI RO LAN TRUYỀN</td></tr>';
+  rows+=indRow(14);
+  rows+=clusterBlock('lp');
+  rows+=indRow(16);
+
+  rows+='<tr class="block-hdr"><td colspan="4">BLOCK A — CRYPTO</td></tr>';
+  rows+=indRow(17);
+  rows+=clusterBlock('tlc');
+
+  rows+='<tr class="block-hdr"><td colspan="4">BLOCK B — VIỆT NAM</td></tr>';
+  BLOCK_B.forEach(function(id){rows+=indRow(id);});
+  var cpivn=inds.find(function(i){return i.name&&i.name.indexOf('CPI Việt')>=0;});
+
+  rows+='<tr class="block-hdr" style="color:#6ab0ff"><td colspan="4">BLOCK B+ — KINH TẾ VĨ MÔ VIỆT NAM (không tính phiếu)</td></tr>';
+  BLOCK_BPLUS.forEach(function(id){rows+=indRow(id);});
+
+  // Block C
+  var bcSig=function(obj){
+    if(!obj.val) return '<span style="color:#2a3848">—</span>';
+    return sigIcon(obj.signal)+' <span style="color:var(--muted);font-size:10px">'+obj.val+'</span>';
+  };
+
+  var blockCHtml='<div class="blockc-box">'
+    +'<div style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase">BLOCK C — PHẦN CHÌM (không tính phiếu, trọng số định tính cao hơn)</div>'
+    +'<div class="blockc-grid">'
+    +'<div class="blockc-item">'+sigIcon(blockC.netliq.signal)+'<span style="font-size:11px"><span style="color:#3a4858">Net Liq:</span> '+(blockC.netliq.val||'—')+'</span></div>'
+    +'<div class="blockc-item">'+sigIcon(blockC.sofr.signal)+'<span style="font-size:11px"><span style="color:#3a4858">SOFR:</span> '+(blockC.sofr.val||'—')+'</span></div>'
+    +'<div class="blockc-item">'+sigIcon(blockC.cdx.signal)+'<span style="font-size:11px"><span style="color:#3a4858">CDX HY:</span> '+(blockC.cdx.val||'—')+'</span></div>'
+    +'<div class="blockc-item">'+sigIcon(blockC.sofrFed.signal)+'<span style="font-size:11px"><span style="color:#3a4858">SOFR-Fed:</span> '+(blockC.sofrFed.val||'—')+'</span></div>'
+    +'</div>'
+    +'<div class="note-box">Net Liquidity: công thức WALCL - TGA - RRP. Tương quan cao với S&P 500 giai đoạn 2020-2022; sau đó biến động theo nhiều yếu tố khác (AI earnings, fiscal). Dùng như chỉ báo phân tích ống nước, không phải dự báo giá cổ phiếu.<br>SOFR-Fed Rate: proxy stress thanh khoản. Bình thường SOFR &lt; EFFR; khi SOFR vượt trần là cảnh báo rõ. Theo dõi BGCR từ NY Fed thay vì GCF Index (đã thay đổi từ 9/2025).</div>'
+    +'</div>';
+
+  var actionLines=kb.action.split('\n');
+  var actionHtml=actionLines.map(function(l){return '<div style="margin-top:4px">'+l+'</div>';}).join('');
+
+  panel.innerHTML=
+    '<div class="score-card" style="border-color:'+kb.border+';background:'+kb.bg+'">'
+    +'<div class="score-top">'
+    +'<div class="score-numbox">'
+    +'<div class="score-bignum" style="color:'+kb.color+'">'+deV+'</div>'
+    +'<div style="font-size:12px;color:var(--muted)">/21 phiếu DE-RISK</div>'
+    +'<div style="font-size:10px;color:#3a4050;margin-top:2px">'+totalVoted+' chỉ số nhập tay (TV fields từ ảnh)</div>'
+    +'</div>'
+    +'<div class="score-right">'
+    +'<div class="score-level" style="color:'+kb.color+'">'+kb.emoji+' '+kb.level+'</div>'
+    +'<div class="score-action">'+actionHtml+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:3px;margin-top:12px" title="0-2: Thuận lợi | 3-4: Trung tính | 5-9: Thận trọng nhẹ | 10-14: Thận trọng rõ | 15+: Khủng hoảng">'
+    +bars+'</div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:9px;color:#2a3848;margin-top:3px"><span>0</span><span>3</span><span>5</span><span>10</span><span>15</span><span>21</span></div>'
+    +'</div>'
+
+    +'<button class="detail-btn" onclick="toggleDetail(this)" id="detail-btn">Chi tiết 25 chỉ số ▾</button>'
+    +'<div id="detail-panel" style="display:none">'
+    +'<table class="ind-table">'+rows+'</table>'
+    +blockCHtml
+    +'</div>';
+}
+
+function toggleDetail(btn){
+  var p=document.getElementById('detail-panel');
+  if(!p) return;
+  var shown=p.style.display!=='none';
+  p.style.display=shown?'none':'block';
+  btn.textContent=shown?'Chi tiết 25 chỉ số ▾':'Thu gọn ▴';
+}
+
+// ---- CONVERT SJC (auto-detect ngan dong vs trieu/luong) ----
+function convertSJC(){
+  var el=document.getElementById('v-sjc');
+  var note=document.getElementById('sjc-note');
+  if(!el) return;
+  var raw=el.value.trim();
+  // Chỉ convert khi có dấu phẩy (format PNJ/SJC: "146,700")
+  if(raw.indexOf(',')!==-1){
+    var val=parseFloat(raw.replace(/,/g,''));
+    if(!isNaN(val)&&val>=1000){
+      // Ngàn đồng -> triệu/lượng (chia 1000)
+      var converted=(val/1000).toFixed(1);
+      el.value=converted;
+      if(note) note.textContent='→ Đã đổi: '+raw+' ngàn đồng ÷1000 = '+converted+' triệu/lượng';
+    }
+  } else {
+    if(note) note.textContent='';
+  }
+  autoGen();
+}
+
+// ---- PARSE SJC VALUE (tra ve trieu/luong cho scoring/output) ----
+function getSJCValue(){
+  var raw=(document.getElementById('v-sjc')||{}).value||'';
+  var val=parseFloat(raw.replace(/,/g,''));
+  if(isNaN(val)) return NaN;
+  // Nếu vẫn còn lớn hơn 1000 mà chưa convert (user nhập tay không có phẩy)
+  return val>=1000 ? val/1000 : val;
+}
+
+// ---- OUTPUT GENERATION ----
+function autoGen(){
+  updateAllThresh();
+  var score=computeScore();
+  renderScorePanel(score);
+
+  var date=v('f-date')||'--/--/----';
+  var dt=date?new Date(date+'T12:00:00'):null;
+  var dayStr=dt?DAYS[dt.getDay()]:'--';
+  var deStr=score?score.deV+'/21':'?/21';
+
+  var out='';
+  out+='=== MACRO INPUT v7 (25 chỉ số / 21 phiếu) — '+dayStr+', '+date+' ===\n';
+  out+='[TV fields đọc từ ảnh chụp TradingView — paste ảnh kèm theo khi gửi Claude]\n';
+  out+='Phiếu DE-RISK từ dữ liệu nhập tay: '+deStr+'\n\n';
+
+  out+='--- BLOCK A: MACRO MỸ ---\n';
+  out+='1.  Yield Curve (10Y-2Y):               [TV — US10Y & US02Y]\n';
+  out+='2.  DXY:                                [TV]\n';
+  out+='3.  10Y Treasury [Cụm Lãi Suất Thực]:  [TV]\n';
+  out+='4.  CPI Mỹ YoY [Cụm Lạm Phát]:        '+(v('v-cpi-us')||'N/A')+'%\n';
+  out+='5.  PPI Mỹ YoY [Cụm Lạm Phát]:        '+(v('v-ppi-us')||'N/A')+'%\n';
+  out+='6.  Fed Funds Rate:                     '+(v('v-fed')||'N/A')+'%\n';
+  out+='7.  M2 Money Supply YoY:               '+(v('v-m2')||'N/A')+'%\n';
+  out+='8.  VIX:                                [TV]\n';
+  out+='9.  USD/JPY:                            [TV]\n';
+  out+='10. Copper/Gold Ratio:                  [TV — HG1! & GC1!]\n';
+  out+='11. MOVE Index:                         [TV]\n';
+  out+='12. TIPS 10Y Real Yield [Cụm LST]:     [TV — DFII10]\n';
+  out+='13. ETF Flows (tháng):                  '+(v('v-etf')||'N/A')+' tỷ USD\n\n';
+
+  out+='--- BLOCK A: KINH TẾ THỰC & RỦI RO LAN TRUYỀN ---\n';
+  var bdiTrend2=gs('v-bdi-trend');
+  var bdiLabel2={'up':'Tăng','flat':'Đi ngang','down':'Giảm','':'Chưa chọn'}[bdiTrend2]||'?';
+  out+='14. Baltic Dry Index:                   '+(v('v-bdi')||'N/A')+' đ (xu hướng 3-4 tuần: '+bdiLabel2+')\n';
+  out+='15. Brent Crude Oil [Cụm Lạm Phát]:    [TV — UKOIL]\n';
+  out+='16. KOSPI (biến động tuần):             [TV — KRX:KOSPI]\n\n';
+
+  out+='--- BLOCK A: CRYPTO ---\n';
+  out+='17. BTC / ETH:                          [TV — BTCUSDT / ETHUSDT]\n';
+  out+='18. Fear and Greed [Cụm Tâm Lý]:       '+(v('v-fg')||'N/A')+'/100\n';
+  out+='19. BTC Dominance [Cụm Tâm Lý]:        [TV — BTC.D]\n\n';
+
+  out+='--- BLOCK B: VIỆT NAM ---\n';
+  var nn2=parseFloat(v('v-nn'));
+  var nnStr=isNaN(nn2)?'N/A':(nn2<0?'Bán ròng '+Math.abs(nn2):'Mua ròng '+nn2)+' tỷ đồng';
+  out+='20. VN-Index:                           [TV — VNINDEX]\n';
+  out+='21. Khối ngoại HOSE:                    '+nnStr+'\n';
+  var sjcOut=getSJCValue(); out+='22. Vàng SJC:                           '+(isNaN(sjcOut)?'N/A':sjcOut.toFixed(1))+' triệu/lượng (bán ra)\n';
+  out+='23. USD/VND:                            '+(v('v-usdvnd')||'N/A')+' (VCB bán ra)\n';
+  out+='24. Lãi tiết kiệm 12T:                 '+(v('v-lsts')||'N/A')+'%\n';
+  out+='25. Lãi vay sau ưu đãi:                '+(v('v-lvay')||'N/A')+'%\n';
+  out+='    CPI Việt Nam YoY:                  '+(v('v-cpi-vn')||'N/A')+'%\n\n';
+
+  out+='--- BLOCK B+: KINH TẾ VĨ MÔ VIỆT NAM (không tính phiếu — context bổ sung) ---\n';
+  out+='Tín dụng hệ thống YoY: '+(v('v-credit-growth')||'N/A')+'%  (>14%: thuận lợi | 8-14%: bình thường | <8%: thắt chặt)\n';
+  out+='Lãi suất LNH O/N VND: '+(v('v-ibr-on')||'N/A')+'%  (<3%: dồi dào | 3-5%: bình thường | >5%: căng thẳng)\n';
+  out+='FDI thực hiện lũy kế năm: '+(v('v-fdi')||'N/A')+' tỷ USD\n';
+  out+='PMI sản xuất VN: '+(v('v-pmi-vn')||'N/A')+'  (>52: mở rộng tốt | 50-52: nhẹ | <50: thu hẹp)\n';
+  out+='Cán cân thương mại: '+(v('v-trade-bal')||'N/A')+' tỷ USD  (dương: xuất siêu, VND ổn định)\n';
+  out+='M2 Việt Nam YoY: '+(v('v-m2-vn')||'N/A')+'%  (>12%: dồi dào | 8-12%: bình thường | <8%: thắt chặt)\n\n';
+
+  out+='--- BLOCK C: PHẦN CHÌM (thứ Hai, trọng số cao hơn, không tính vào 21 phiếu) ---\n';
+  out+='WALCL: '+(v('v-walcl')||'N/A')+' tỷ USD\n';
+  out+='TGA: '+(v('v-tga')||'N/A')+' tỷ USD\n';
+  out+='RRP: '+(v('v-rrp')||'N/A')+' tỷ USD\n';
+  out+='Net Liquidity (WALCL-TGA-RRP): '+(v('v-netliq')||'N/A')+' tỷ USD\n';
+  out+='CDX HY Spread: '+(v('v-cdx')||'N/A')+' bps\n';
+  out+='SOFR: '+(v('v-sofr')||'N/A')+'%\n';
+  var sofr3=parseFloat(v('v-sofr')), fed3=parseFloat(v('v-fed'));
+  var sofrFedStr=(!isNaN(sofr3)&&!isNaN(fed3))?(sofr3-fed3).toFixed(3)+'% (proxy stress LNH)':'N/A';
+  out+='SOFR-Fed Rate Spread: '+sofrFedStr+'\n\n';
+
+  out+='--- YÊU CẦU PHÂN TÍCH ---\n';
+  out+='Đối chiếu macro-nguong-chuan-v3 (25 chỉ số / 21 phiếu hiệu lực).\n';
+  out+='3 cụm OR: Cụm Lạm Phát (#4,5,15), Cụm Lãi Suất Thực (#3,12), Cụm Tâm Lý Crypto (#18,19).\n';
+  out+='TV fields (#1-3, #8-12, #15-17, #19-20) đọc từ ảnh chụp TradingView đính kèm.\n';
+  out+='Output: Môi trường toàn cầu -> Tác động VN -> BĐS Ninh Hòa -> Rủi ro + khuyến nghị.';
+
+  document.getElementById('output-block').textContent=out;
+}
+
+
+// ---- THRESHOLD BAR RENDERER ----
+function tp(label, type, active){
+  var cls='tp'+(active?' act-'+type:'');
+  return '<div class="'+cls+'" title="'+label+'">'+label+'</div>';
+}
+function setTB(id, onLabel, neuLabel, deLabel, sig){
+  var el=document.getElementById('tb-'+id);
+  if(!el) return;
+  if(sig===null){el.innerHTML='';return;}
+  el.innerHTML=tp(onLabel,'on',sig==='on')+tp(neuLabel,'neu',sig==='neu')+tp(deLabel,'de',sig==='de');
+}
+
+function updateAllThresh(){
+  // CPI Mỹ
+  var cpu=gv('v-cpi-us');
+  setTB('v-cpi-us','< 3%','3–4%','> 4%',isNaN(cpu)?null:cpu<3?'on':cpu<=4?'neu':'de');
+
+  // PPI Mỹ
+  var ppu=gv('v-ppi-us');
+  setTB('v-ppi-us','< 3%','3–5%','> 5%',isNaN(ppu)?null:ppu<3?'on':ppu<=5?'neu':'de');
+
+  // Fed Funds Rate
+  var fed=gv('v-fed');
+  setTB('v-fed','< 3.5%','3.5–4.5%','> 4.5%',isNaN(fed)?null:fed<3.5?'on':fed<=4.5?'neu':'de');
+
+  // M2 (reversed)
+  var m2=gv('v-m2');
+  setTB('v-m2','> 5%','3–5%','< 3%',isNaN(m2)?null:m2>5?'on':m2>=3?'neu':'de');
+
+  // ETF Flows
+  var etf=gv('v-etf');
+  setTB('v-etf','> $100B/tháng','$0–100B','< $0 (rút ròng)',isNaN(etf)?null:etf>100?'on':etf>=0?'neu':'de');
+
+  // BDI — handled by dropdown signal, no numeric bar needed
+  setTB('v-bdi','Tăng 3–4 tuần','Đi ngang','Giảm liên tục',null);
+
+  // Fear & Greed
+  var fg=gv('v-fg');
+  setTB('v-fg','> 60 (Tham lam)','40–60 (Trung tính)','< 40 (Sợ hãi)',isNaN(fg)?null:fg>60?'on':fg>=40?'neu':'de');
+
+  // BTC Dominance
+  var btcd=gv('v-btcd');
+  setTB('v-btcd','< 50% (Altcoin mùa)','50–60%','> 60% (BTC-only)',isNaN(btcd)?null:btcd<50?'on':btcd<=60?'neu':'de');
+
+  // No threshold for BTC/ETH price
+  setTB('v-btc','','','',null);
+  setTB('v-eth','','','',null);
+
+  // VN-Index
+  var vni=gv('v-vnindex');
+  setTB('v-vnindex','> 1,400','1,200–1,400','< 1,200',isNaN(vni)?null:vni>1400?'on':vni>=1200?'neu':'de');
+
+  // Khối ngoại
+  var nn=gv('v-nn');
+  setTB('v-nn','Mua ròng > 0','0 – −500 tỷ','Bán ròng > 500 tỷ',isNaN(nn)?null:nn>0?'on':nn>=-500?'neu':'de');
+
+  // SJC — informational
+  setTB('v-sjc','','','',null);
+
+  // USD/VND
+  var uv=parseFloat((gs('v-usdvnd')||'').replace(/,/g,''));
+  setTB('v-usdvnd','< 25,000','25,000–25,500','> 25,500',isNaN(uv)?null:uv<25000?'on':uv<=25500?'neu':'de');
+
+  // Lãi tiết kiệm
+  var ls=gv('v-lsts');
+  setTB('v-lsts','< 5.5%','5.5–6.5%','> 6.5% (cạnh tranh BĐS)',isNaN(ls)?null:ls<5.5?'on':ls<=6.5?'neu':'de');
+
+  // Lãi vay
+  var lv=parseFloat(gs('v-lvay'));
+  setTB('v-lvay','< 9%','9–11%','> 11% (áp lực vay)',isNaN(lv)?null:lv<9?'on':lv<=11?'neu':'de');
+
+  // Block C
+  setTB('v-walcl','','','',null);
+  setTB('v-tga','','','',null);
+  setTB('v-rrp','','','',null);
+  setTB('v-netliq','','','',null);
+
+  var cdx=gv('v-cdx');
+  setTB('v-cdx','< 300 bps','300–400 bps','> 400 bps',isNaN(cdx)?null:cdx<300?'on':cdx<=400?'neu':'de');
+
+  var sofr=gv('v-sofr');
+  setTB('v-sofr','≤ 4.0%','4.0–4.5%','> 4.5%',isNaN(sofr)?null:sofr<=4.0?'on':sofr<=4.5?'neu':'de');
+
+  // CPI VN — informational
+  setTB('v-cpi-vn','< 3% (thấp)','3–5% (kiểm soát)','> 5% (cảnh báo)',
+    isNaN(gv('v-cpi-vn'))?null:gv('v-cpi-vn')<3?'on':gv('v-cpi-vn')<=5?'neu':'de');
+
+  // Block B+ — Tín dụng hệ thống YoY
+  var cg=gv('v-credit-growth');
+  setTB('v-credit-growth','> 14% (thuận lợi)','8–14% (bình thường)','< 8% (thắt chặt)',
+    isNaN(cg)?null:cg>14?'on':cg>=8?'neu':'de');
+
+  // Block B+ — Lãi suất liên ngân hàng O/N
+  var ibr=gv('v-ibr-on');
+  setTB('v-ibr-on','< 3% (dồi dào)','3–5% (bình thường)','> 5% (căng thẳng)',
+    isNaN(ibr)?null:ibr<3?'on':ibr<=5?'neu':'de');
+
+  // Block B+ — FDI thực hiện (informational, không có ngưỡng tuyệt đối)
+  setTB('v-fdi','','','',null);
+
+  // Block B+ — PMI sản xuất VN
+  var pmi=gv('v-pmi-vn');
+  setTB('v-pmi-vn','> 52 (mở rộng tốt)','50–52 (mở rộng nhẹ)','< 50 (thu hẹp)',
+    isNaN(pmi)?null:pmi>52?'on':pmi>=50?'neu':'de');
+
+  // Block B+ — Cán cân thương mại
+  var tb=gv('v-trade-bal');
+  setTB('v-trade-bal','> 0 (xuất siêu)','— (cân bằng)','< −1 tỷ (nhập siêu rõ)',
+    isNaN(tb)?null:tb>0?'on':tb>=-1?'neu':'de');
+
+  // Block B+ — M2 Việt Nam YoY
+  var m2vn=gv('v-m2-vn');
+  setTB('v-m2-vn','> 12% (dồi dào)','8–12% (bình thường)','< 8% (thắt chặt)',
+    isNaN(m2vn)?null:m2vn>12?'on':m2vn>=8?'neu':'de');
+}
+
+// ---- INIT ----
+window.addEventListener('load',function(){
+  var saved=localStorage.getItem('fred_api_key');
+  if(saved) document.getElementById('fred-api-key').value=saved;
+
+  var today=new Date();
+  var y=today.getFullYear();
+  var m=String(today.getMonth()+1).padStart(2,'0');
+  var d=String(today.getDate()).padStart(2,'0');
+  document.getElementById('f-date').value=y+'-'+m+'-'+d;
+  onDateChange();
+
+  // Khôi phục giá trị hàng tháng
+  ['cpi_us','fed_rate','ppi_us','m2_yoy','etf_flows','cpi_vn','credit_growth','ibr_on','fdi','pmi_vn','trade_bal','m2_vn','lsts','lvay'].forEach(function(k){
+    var map={cpi_us:'v-cpi-us',fed_rate:'v-fed',ppi_us:'v-ppi-us',m2_yoy:'v-m2',etf_flows:'v-etf',cpi_vn:'v-cpi-vn',credit_growth:'v-credit-growth',ibr_on:'v-ibr-on',fdi:'v-fdi',pmi_vn:'v-pmi-vn',trade_bal:'v-trade-bal',m2_vn:'v-m2-vn',lsts:'v-lsts',lvay:'v-lvay'};
+    var val=localStorage.getItem(k);
+    if(val) sv(map[k],val);
+  });
+
+  autoGen();
+  updateMonthlyBanner();
+  // Note v7: KOSPI/CG history removed — values come from TradingView screenshot
+});
+
+// Lưu giá trị hàng tháng khi thay đổi
+document.addEventListener('input',function(e){
+  var monthlyMap={
+    'v-cpi-us':'cpi_us','v-fed':'fed_rate','v-ppi-us':'ppi_us',
+    'v-m2':'m2_yoy','v-etf':'etf_flows','v-cpi-vn':'cpi_vn',
+    'v-credit-growth':'credit_growth','v-ibr-on':'ibr_on','v-fdi':'fdi',
+    'v-pmi-vn':'pmi_vn','v-trade-bal':'trade_bal','v-m2-vn':'m2_vn',
+    'v-lsts':'lsts','v-lvay':'lvay'
+  };
+  if(monthlyMap[e.target.id]){
+    var key=monthlyMap[e.target.id];
+    localStorage.setItem(key, e.target.value);
+    // Đánh dấu tháng đã cập nhật
+    if(e.target.value.trim()) saveMonthlyMark(key);
+    updateMonthlyBanner();
+  }
+});
+
+  function copyGemini(prompt, btnId) {
+    var now = new Date();
+    var month = now.getMonth() + 1;
+    var year = now.getFullYear();
+    var text = prompt.replace('[MONTH]', month).replace('[YEAR]', year);
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById(btnId);
+      var orig = btn.innerHTML;
+      btn.innerHTML = '✓ Đã copy!';
+      btn.style.background = '#0d3020';
+      btn.style.color = '#3fb950';
+      btn.style.borderColor = '#1a4a2a';
+      setTimeout(function(){ 
+        btn.innerHTML = orig; 
+        btn.style.background = '#0d1830';
+        btn.style.color = '#6ab0ff';
+        btn.style.borderColor = '#1a3060';
+      }, 2000);
+    }).catch(function() {
+      prompt2 = text;
+      window.prompt('Copy câu lệnh này rồi paste vào Gemini:', text);
+    });
+  }
+
+</script>
+</body>
+</html>
